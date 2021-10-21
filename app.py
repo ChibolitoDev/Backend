@@ -1,5 +1,7 @@
-from flask import Flask
-from flask_migrate import Migrate
+import json
+
+from flask import Flask, request, jsonify
+from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -11,25 +13,51 @@ NAME_DB= 'CRUD-ITana'
 DB_CONN= f'postgresql://{USER_DB}:{PASS_DB}@{URL_DB}/{NAME_DB}'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_CONN
-app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-migrate = Migrate()
-migrate.init_app(app, db)
+ma= Marshmallow(app)
 
 class DATA(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    year = db.Column(db.String(250))
-    level_1= db.Column(db.String(250))
-    level_2 = db.Column(db.String(250))
-    value = db.Column(db.String(250))
+    year = db.Column(db.String(80))
+    level_1= db.Column(db.String(80))
+    level_2 = db.Column(db.String(80))
+    value = db.Column(db.String(80))
 
-    def __str__(self):
-        return(
-            f'Id: {self.id},'
-            f'Year: {self.year},'
-            f'Level_1: {self.level_1},'
-            f'Level_2: {self.level_2},'
-            f'Value: {self.value},'
-        )
+    def __init__(self, year, level_1,level_2, value ):
+        self.year = year
+        self.level_1 = level_1
+        self.level_2= level_2
+        self.value= value
+
+db.create_all()
+
+class DATASchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'level_1','level_2', 'value','year')
+
+data_schema = DATASchema()
+datas_schema = DATASchema(many=True)
+
+
+@app.route('/', methods=['POST'])
+def DataPost():
+    year = request.json['year']
+    level_1 =request.json['level_1']
+    level_2 = request.json['level_2']
+    value = request.json['value']
+    new_data = DATA(year,level_1,level_2,value)
+    db.session.add(new_data)
+    db.session.commit()
+    return data_schema.jsonify(new_data)
+@app.route('/', methods=['GET'])
+def DataGet():
+    data = DATA.query.all()
+    res = datas_schema.dump(data)
+    return jsonify(res)
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
