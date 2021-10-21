@@ -56,6 +56,10 @@ def DataGet():
     data = DATA.query.all()
     res = datas_schema.dump(data)
     return jsonify(res)
+@app.route('/<id>', methods=['GET'])
+def SingleGet(id):
+    data = DATA.query.get(id)
+    return data_schema.jsonify(data)
 
 
 
