@@ -76,5 +76,11 @@ def DataPut(id):
 
     return data_schema.jsonify(data)
 
+@app.route('/<id>', methods=['DELETE'])
+def DataDelete(id):
+    data = DATA.query.get(id)
+    db.session.delete(data)
+    db.session.commit()
+    return data_schema.jsonify(data)
 if __name__ == "__main__":
     app.run(debug=True)
