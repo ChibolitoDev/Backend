@@ -61,7 +61,20 @@ def SingleGet(id):
     data = DATA.query.get(id)
     return data_schema.jsonify(data)
 
+@app.route('/<id>', methods=['PUT'])
+def DataPut(id):
+    data = DATA.query.get(id)
+    year = request.json['year']
+    level_1 =request.json['level_1']
+    level_2 = request.json['level_2']
+    value = request.json['value']
+    data.year = year
+    data.level_1 = level_1
+    data.level_2 = level_2
+    data.value = value
+    db.session.commit()
 
+    return data_schema.jsonify(data)
 
 if __name__ == "__main__":
     app.run(debug=True)
