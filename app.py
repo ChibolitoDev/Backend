@@ -3,9 +3,10 @@ import json
 from flask import Flask, request, jsonify
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 USER_DB = 'postgres'
 PASS_DB = 'root'
 URL_DB = 'localhost'
