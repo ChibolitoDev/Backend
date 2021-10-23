@@ -54,7 +54,7 @@ def DataPost():
     return data_schema.jsonify(new_data)
 @app.route('/', methods=['GET'])
 def DataGet():
-    data = DATA.query.all()
+    data = DATA.query.order_by(DATA.id).all()
     res = datas_schema.dump(data)
     return jsonify(res)
 @app.route('/<id>', methods=['GET'])
